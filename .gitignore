@@ -12,3 +12,9 @@ docs/
 
 # Dotenv file
 .env
+
+# Audit reports
+src/solidit-scrapping/audit-reports
+
+.venv/
+.github/
