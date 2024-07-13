@@ -10,8 +10,13 @@ contract RegistryTest is Test {
     
     uint256 SCANS = 100;
 
+    address alice = makeAddr("alice");
+    address operator = makeAddr("operator");
+
     function setUp() public {
+        vm.prank(operator);
         registry = new Registry();
+
         protocolId = keccak256("SAMPLE PROTOCOL");
     }
 
@@ -28,6 +33,15 @@ contract RegistryTest is Test {
         return (scope, SCANS);
     }
 
+    function _registerSampleProtocol(address[] memory _scope, uint256 _scans) internal returns (address[] memory, uint256) {
+        uint256 pricePerContractScan = registry.PRICE_PER_CONTRACT_SCAN();
+        uint256 price = _scans * _scope.length * pricePerContractScan;
+
+        registry.registerProtocol{ value: price }(protocolId, _scope, _scans);
+
+        return (_scope, _scans);
+    }
+
     function test_registerProtocol() public {
         _registerSampleProtocol();
 
@@ -37,9 +51,40 @@ contract RegistryTest is Test {
         assertEq(scopeRegistry[1], address(1));
     }
 
-    function test_subscription() public {
+    function test_onlyOperator() public {
         _registerSampleProtocol();
 
+        bytes32[] memory protocolIds = new bytes32[](1);
+        protocolIds[0] = protocolId;
+
+        vm.expectRevert(Registry__OnlyOperator.selector);
+        vm.prank(alice);
+        registry.postScan(protocolIds);
+    }
+
+    function test_subscription() public {
+        address[] memory scope = new address[](2);
+        scope[0] = address(0);
+        scope[1] = address(1);
+
+        bytes32[] memory protocolIds = new bytes32[](1);
+        protocolIds[0] = protocolId;
+
+        _registerSampleProtocol(scope, 1);
+
         assertTrue(registry.isSubscribed(protocolId));
+
+        vm.prank(operator);
+        registry.postScan(protocolIds);
+
+        (, uint256 scansRemaining) = registry.getSubscription(protocolId);
+        assertEq(scansRemaining, 0);
+
+        vm.prank(operator);
+        registry.postScan(protocolIds);
+
+        (address[] memory scopeAfterDeletion, uint256 scansAfterDeletion) = registry.getSubscription(protocolId);
+        assertEq(scopeAfterDeletion.length, 0);
+        assertEq(scansAfterDeletion, 0);
     }
 }
