@@ -7,6 +7,8 @@ import "forge-std/Test.sol";
 contract RegistryTest is Test {
     Registry registry;
     bytes32 protocolId;
+    
+    uint256 SCANS = 100;
 
     function setUp() public {
         registry = new Registry();
@@ -14,31 +16,30 @@ contract RegistryTest is Test {
     }
 
     function _registerSampleProtocol() internal returns (address[] memory, uint256) {
-        uint256 duration = 30 days;
-
         address[] memory scope = new address[](2);
         scope[0] = address(0);
         scope[1] = address(1);
 
-        registry.registerProtocol{ value: registry.PRICE_PER_DAY() * duration }(protocolId, scope, duration);
+        uint256 pricePerContractScan = registry.PRICE_PER_CONTRACT_SCAN();
+        uint256 price = SCANS * scope.length * pricePerContractScan;
 
-        return (scope, duration);
+        registry.registerProtocol{ value: price }(protocolId, scope, SCANS);
+
+        return (scope, SCANS);
     }
 
     function test_registerProtocol() public {
         _registerSampleProtocol();
 
-        (address[] memory scopeRegistry, uint256 expirationRegistry) = registry.getSubscription(protocolId);
-        assertEq(expirationRegistry, uint256(block.timestamp + 30 days));
+        (address[] memory scopeRegistry, uint256 scansRegistry) = registry.getSubscription(protocolId);
+        assertEq(scansRegistry, 100);
         assertEq(scopeRegistry[0], address(0));
         assertEq(scopeRegistry[1], address(1));
     }
 
     function test_subscription() public {
-        (, uint256 duration) = _registerSampleProtocol();
+        _registerSampleProtocol();
 
         assertTrue(registry.isSubscribed(protocolId));
-        skip(duration + 1);
-        assertFalse(registry.isSubscribed(protocolId));
     }
 }
