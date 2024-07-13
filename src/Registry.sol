@@ -11,7 +11,7 @@ contract Registry {
 
     event ProtocolAdded(bytes32 protocolId);
     event ProtocolRemoved(bytes32 protocolId);
-    event ProtocolScanned(bytes32 protocolId);
+    event ProtocolScanned(bytes32 protocolId, bytes32 proof);
 
     /*//////////////////////////////////////////////////////////////
                                 STORAGE
@@ -66,7 +66,9 @@ contract Registry {
         subscription.scans = _scans;
     }
 
-    function postScan(bytes32[] calldata _protocolIds) external onlyOperator {
+    function postScan(bytes32[] calldata _protocolIds, bytes32[] calldata _proofs) external onlyOperator {
+        if (_protocolIds.length != _proofs.length) revert Registry__ArrayLengthsMismatch();
+
         for (uint256 i = 0; i < _protocolIds.length; i++) {
             // TODO: check if protocol is valid
             if (!isSubscribed(_protocolIds[i])) {
@@ -76,8 +78,7 @@ contract Registry {
             } else {
                 protocolMapping[_protocolIds[i]].scans -= 1;
 
-                // TODO: add proof
-                emit ProtocolScanned(_protocolIds[i]);
+                emit ProtocolScanned(_protocolIds[i], _proofs[i]);
             }
         }
     }

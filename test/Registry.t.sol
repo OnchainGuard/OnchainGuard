@@ -51,17 +51,21 @@ contract RegistryTest is Test {
         assertEq(scopeRegistry[0], address(0));
         assertEq(scopeRegistry[1], address(1));
         assertEq(admin, protocolAdmin);
+
+        assertEq(registry.operator(), operator);
     }
 
     function test_onlyOperator() public {
         _registerSampleProtocol();
 
+        bytes32[] memory proofs = new bytes32[](1);
         bytes32[] memory protocolIds = new bytes32[](1);
         protocolIds[0] = protocolId;
+        proofs[0] = "";
 
         vm.expectRevert(Registry__OnlyOperator.selector);
         vm.prank(alice);
-        registry.postScan(protocolIds);
+        registry.postScan(protocolIds, proofs);
     }
 
     function test_onlyProtocolAdmin() public {
@@ -71,7 +75,6 @@ contract RegistryTest is Test {
         newScope[0] = address(0);
 
         uint256 newScans = 21;
-
 
         vm.expectRevert(Registry__OnlyProtocolAdmin.selector);
         vm.prank(alice);
@@ -83,25 +86,41 @@ contract RegistryTest is Test {
         scope[0] = address(0);
         scope[1] = address(1);
 
+        bytes32[] memory proofs = new bytes32[](1);
         bytes32[] memory protocolIds = new bytes32[](1);
         protocolIds[0] = protocolId;
+        proofs[0] = "";
 
         _registerSampleProtocol(scope, 1);
 
         assertTrue(registry.isSubscribed(protocolId));
 
         vm.prank(operator);
-        registry.postScan(protocolIds);
+        registry.postScan(protocolIds, proofs);
 
         (, uint256 scansRemaining, ) = registry.getSubscription(protocolId);
         assertEq(scansRemaining, 0);
 
         vm.prank(operator);
-        registry.postScan(protocolIds);
+        registry.postScan(protocolIds, proofs);
 
         (address[] memory scopeAfterDeletion, uint256 scansAfterDeletion, address adminAfterDeletion) = registry.getSubscription(protocolId);
         assertEq(scopeAfterDeletion.length, 0);
         assertEq(scansAfterDeletion, 0);
         assertEq(adminAfterDeletion, address(0));
+    }
+
+    function test_postScanInputHandling() public {
+        _registerSampleProtocol();
+
+        bytes32[] memory proofs = new bytes32[](2);
+        bytes32[] memory protocolIds = new bytes32[](1);
+        protocolIds[0] = protocolId;
+        proofs[0] = "";
+        proofs[1] = "";
+
+        vm.expectRevert(Registry__ArrayLengthsMismatch.selector);
+        vm.prank(operator);
+        registry.postScan(protocolIds, proofs);
     }
 }
