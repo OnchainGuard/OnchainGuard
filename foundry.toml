@@ -4,8 +4,3 @@ out = "out"
 libs = ["lib"]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
-
-[etherscan]
-arbitrum_sepolia = { key = "Q64HP2BNZPWFHA5PQB9UWB2YMRWMGE4JVM", chain = "421614", url = "https://api-sepolia.arbiscan.io/api" }
-linea_sepolia = { key = "Z5S4BBEMNMDMVI3VY6MYMVHU6X41KKY82E", chain = "59141", url = "https://api-sepolia.lineascan.build/api" }
-zircuit_testnet = { key = "6F2EAAF483D6B80ABEC233470EE1E0100A", chain = "48899", url = "https://api-sepolia.lineascan.build/api" }
