@@ -19,6 +19,7 @@ contract RegistryTest is Test {
         registry = new Registry();
 
         protocolId = keccak256("SAMPLE PROTOCOL");
+        vm.deal(protocolAdmin, 100 ether);
     }
 
     function _registerSampleProtocol() internal returns (address[] memory, uint256) {
@@ -81,6 +82,28 @@ contract RegistryTest is Test {
         registry.updateSubscription(protocolId, newScope, newScans);
     }
 
+    function test_updateSubscription() public {
+        _registerSampleProtocol();
+
+        address[] memory newScope = new address[](1);
+        newScope[0] = address(0);
+
+        uint256 newScans = 2;
+
+        vm.expectRevert(Registry__InvalidScansAmount.selector);
+        vm.prank(protocolAdmin);
+        registry.updateSubscription(protocolId, newScope, newScans);
+
+        newScans = 101;
+        uint256 price = registry.getPrice(1, newScans);
+        vm.prank(protocolAdmin);
+        registry.updateSubscription{ value: price }(protocolId, newScope, newScans);
+
+        (address[] memory scopeUpdated, uint256 scansUpdated, ) = registry.getSubscription(protocolId);
+        assertEq(scopeUpdated.length, 1);
+        assertEq(scansUpdated, 101);
+    }
+
     function test_subscription() public {
         address[] memory scope = new address[](2);
         scope[0] = address(0);
@@ -110,6 +133,19 @@ contract RegistryTest is Test {
         assertEq(adminAfterDeletion, address(0));
     }
 
+    function test_registerInputHandling() public {
+        address[] memory scope = new address[](0);
+        uint256 scans = 100;
+
+        vm.expectRevert(Registry__EmptyScope.selector);
+        registry.registerProtocol(protocolId, scope, scans, protocolAdmin);
+
+        scans = 0;
+
+        vm.expectRevert(Registry__InvalidScansAmount.selector);
+        registry.registerProtocol(protocolId, scope, scans, protocolAdmin);
+    }
+
     function test_postScanInputHandling() public {
         _registerSampleProtocol();
 
@@ -122,5 +158,11 @@ contract RegistryTest is Test {
         vm.expectRevert(Registry__ArrayLengthsMismatch.selector);
         vm.prank(operator);
         registry.postScan(protocolIds, proofs);
+    }
+
+    function test_getPrice(uint256 scans, uint256 scopeSize) public {
+        vm.assume(scopeSize < 1_000 && scans < 1_000_000);
+
+        assertEq(registry.getPrice(scans, scopeSize), scans * scopeSize * 1 gwei);
     }
 }

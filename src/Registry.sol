@@ -49,6 +49,9 @@ contract Registry {
     //////////////////////////////////////////////////////////////*/
 
     function registerProtocol(bytes32 _protocolId, address[] calldata _scope, uint256 _scans, address _admin) external payable {
+        if (_scans == 0) revert Registry__InvalidScansAmount();
+        if (_scope.length == 0) revert Registry__EmptyScope();
+
         uint256 price = getPrice(_scope.length, _scans);
         if (msg.value < price) revert Registry__TooLittleETH();
 
@@ -57,11 +60,19 @@ contract Registry {
         emit ProtocolAdded(_protocolId);
     }
 
-    function updateSubscription(bytes32 protocolId, address[] calldata _scope, uint256 _scans) external payable onlyProtocolAdmin(protocolId) {
-        uint256 price = getPrice(_scope.length, _scans);
+    function updateSubscription(bytes32 _protocolId, address[] calldata _scope, uint256 _scans) external payable onlyProtocolAdmin(_protocolId) {
+        Subscription storage subscription = protocolMapping[_protocolId];
+        uint256 oldScopeLength = _scope.length;
+        uint256 scopeDifference = 1;
+        if (_scope.length > oldScopeLength) {
+            scopeDifference = _scope.length - oldScopeLength;
+        }
+
+        if (subscription.scans >= _scans) revert Registry__InvalidScansAmount();
+
+        uint256 price = getPrice(scopeDifference, _scans);
         if (msg.value < price) revert Registry__TooLittleETH();
 
-        Subscription storage subscription = protocolMapping[protocolId];
         subscription.scope = _scope;
         subscription.scans = _scans;
     }
