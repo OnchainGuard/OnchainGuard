@@ -5,12 +5,6 @@ pip install webdriver_manager
 pip install --upgrade urllib3 chardet
 pip install --upgrade requests
 pip install pandas PyPDF2
+pip install web3
 
-
-
-```
-
-### Generate the HTTPS certicates
-```
-openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
 ```

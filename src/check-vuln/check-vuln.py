@@ -1,8 +1,12 @@
-
 import openai
 import os
 import pandas as pd
 import time
+from dotenv import load_dotenv
+import hashlib
+
+# Load environment variables from .env file
+load_dotenv()
 
 def read_text_file(file_path):
     try:
@@ -12,7 +16,11 @@ def read_text_file(file_path):
         print(f"Error reading {file_path}: {e}")
         return None
 
-openai.api_key = 'sk-proj-FSGgvSLdIEszVzvNChc7T3BlbkFJuNvnoIDj6jEYzdzTEXk1'
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+if not openai.api_key:
+    print("API key not found. Please check your .env file.")
+    exit(1)
 
 audit_reports_path = '/home/kgorna/Documents/ethglobalbrussels/OnchainGuard/src/solidit-scrapping/audit-reports'
 smart_contract_path = '/home/kgorna/Documents/ethglobalbrussels/OnchainGuard/src/check-vuln'
@@ -23,14 +31,13 @@ if smart_contract_content is None:
     print("Failed to read the smart contract file.")
     exit(1)
 
-# List TXT files in the directory and limit to the first 5
-vulnerability_files = [f for f in os.listdir(audit_reports_path) if f.endswith('.txt')][:5]
-print(f"Found {len(vulnerability_files)} text files in the directory. Analyzing the first 5 reports.")
+vulnerability_files = [f for f in os.listdir(audit_reports_path) if f.endswith('.txt')][:10]
+print(f"Found {len(vulnerability_files)} text files in the directory. Analyzing the first 10 reports.")
 
-results = pd.DataFrame(columns=["Report Name", "Response"])
+results = pd.DataFrame(columns=["Report Name", "Response", "Hashed Response"])
 
 def query_openai(vf, messages):
-    retry_delay = 1  # Start with a 10 second delay for retry
+    retry_delay = 0  # Start with a short delay for retry
     max_retries = 5  # Maximum number of retries
     attempts = 0
     while attempts < max_retries:
@@ -41,11 +48,11 @@ def query_openai(vf, messages):
                 max_tokens=100,
                 temperature=0.7)
             return response
-        except openai.error.RateLimitError as e:  # Correct exception class
-            print(f"Rate limit error for {vf}, retrying in {retry_delay} seconds...")
+        except openai.error.RateLimitError as e:
+            # print(f"Rate limit error for {vf}, retrying in {retry_delay} seconds...")
             time.sleep(retry_delay)
             retry_delay *= 2  # Exponential backoff
-        except openai.error.OpenAIError as e:  # General OpenAI errors
+        except openai.error.OpenAIError as e:
             print(f"Unhandled OpenAI error for {vf}: {e}")
             return None
         attempts += 1
@@ -63,9 +70,16 @@ for vf in vulnerability_files:
 
     response = query_openai(vf, messages)
     if response:
-        new_row = pd.DataFrame({"Report Name": [vf], "Response": [response.choices[0].message['content']]})
+        response_text = response.choices[0].message['content']
+        hashed_response = hashlib.sha256(response_text.encode()).hexdigest()
+        new_row = pd.DataFrame({"Report Name": [vf], "Response": [response_text], "Hashed Response": [hashed_response]})
         results = pd.concat([results, new_row], ignore_index=True)
+        if response_text.startswith("Yes"):
+            print(f"!!! Vulnerability found in link with report nb {vf}: WARNING SENT TO THE USER FRONTEND.\n")
+        elif "No" in response_text:
+            print(f"No Vulnerability found in link with report {vf}\n")
     else:
         print(f"Failed to get a valid response for {vf} after retries.")
 
 print(results)
+
