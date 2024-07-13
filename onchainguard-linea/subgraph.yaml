@@ -1,0 +1,32 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Registry
+    network: linea-sepolia
+    source:
+      address: "0x404CB427F1406b3fd456910e7036f5db81e9C1C0"
+      abi: Registry
+      startBlock: 2562177
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ProtocolAdded
+        - ProtocolRemoved
+        - ProtocolScanned
+      abis:
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: ProtocolAdded(bytes32)
+          handler: handleProtocolAdded
+        - event: ProtocolRemoved(bytes32)
+          handler: handleProtocolRemoved
+        - event: ProtocolScanned(bytes32,bytes32)
+          handler: handleProtocolScanned
+      file: ./src/registry.ts

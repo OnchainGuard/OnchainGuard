@@ -1,0 +1,24 @@
+type ProtocolAdded @entity(immutable: true) {
+  id: Bytes!
+  protocolId: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProtocolRemoved @entity(immutable: true) {
+  id: Bytes!
+  protocolId: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProtocolScanned @entity(immutable: true) {
+  id: Bytes!
+  protocolId: Bytes! # bytes32
+  proof: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

@@ -1,0 +1,8 @@
+{
+  "linea-sepolia": {
+    "Registry": {
+      "address": "0x404CB427F1406b3fd456910e7036f5db81e9C1C0",
+      "startBlock": 2562177
+    }
+  }
+}

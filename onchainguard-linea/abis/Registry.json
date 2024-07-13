@@ -1,0 +1,151 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  { "inputs": [], "name": "Registry__ArrayLengthsMismatch", "type": "error" },
+  { "inputs": [], "name": "Registry__EmptyScope", "type": "error" },
+  { "inputs": [], "name": "Registry__InvalidScansAmount", "type": "error" },
+  { "inputs": [], "name": "Registry__OnlyOperator", "type": "error" },
+  { "inputs": [], "name": "Registry__OnlyProtocolAdmin", "type": "error" },
+  { "inputs": [], "name": "Registry__TooLittleETH", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "protocolId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ProtocolAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "protocolId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ProtocolRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "protocolId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "proof",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ProtocolScanned",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "PRICE_PER_CONTRACT_SCAN",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_scopeSize", "type": "uint256" },
+      { "internalType": "uint256", "name": "_scans", "type": "uint256" }
+    ],
+    "name": "getPrice",
+    "outputs": [
+      { "internalType": "uint256", "name": "price", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "protocolId", "type": "bytes32" }
+    ],
+    "name": "getSubscription",
+    "outputs": [
+      { "internalType": "address[]", "name": "scope", "type": "address[]" },
+      { "internalType": "uint256", "name": "scans", "type": "uint256" },
+      { "internalType": "address", "name": "admin", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "protocolId", "type": "bytes32" }
+    ],
+    "name": "isSubscribed",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "operator",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "_protocolIds",
+        "type": "bytes32[]"
+      },
+      { "internalType": "bytes32[]", "name": "_proofs", "type": "bytes32[]" }
+    ],
+    "name": "postScan",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "protocolId", "type": "bytes32" }
+    ],
+    "name": "protocolMapping",
+    "outputs": [
+      { "internalType": "uint256", "name": "scans", "type": "uint256" },
+      { "internalType": "address", "name": "admin", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_protocolId", "type": "bytes32" },
+      { "internalType": "address[]", "name": "_scope", "type": "address[]" },
+      { "internalType": "uint256", "name": "_scans", "type": "uint256" },
+      { "internalType": "address", "name": "_admin", "type": "address" }
+    ],
+    "name": "registerProtocol",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_protocolId", "type": "bytes32" },
+      { "internalType": "address[]", "name": "_scope", "type": "address[]" },
+      { "internalType": "uint256", "name": "_scans", "type": "uint256" }
+    ],
+    "name": "updateSubscription",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]
