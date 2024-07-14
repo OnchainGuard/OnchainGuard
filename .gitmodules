@@ -1,3 +1,6 @@
 [submodule "lib/forge-std"]
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "Front-ETHGlobal-Brussels"]
+	path = Front-ETHGlobal-Brussels
+	url = git@github.com:sdaav/Front-ETHGlobal-Brussels.git
