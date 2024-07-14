@@ -4,7 +4,7 @@
 
 An onchain static analyzer for blockchain smart contracts.
 
-> This project has been built during ETHGlobal StarkHack. More information [here](https://ethglobal.com/events/brussels).
+> This project has been built during ETHGlobal Brussels. More information [here](https://ethglobal.com/events/brussels).
 
 - Watch the demo video and project page here 👉 [video](https://ethglobal.com/showcase/onchainguard-ki7x6)
 
