@@ -1,5 +1,16 @@
 # OnchainGuard
-An onchain static analyzer for the blockchain smart contracts
+
+![Banner](/assets/banner-ethglobal.png)
+
+An onchain static analyzer for blockchain smart contracts.
+
+> This project has been built during ETHGlobal StarkHack. More information [here](https://ethglobal.com/events/brussels).
+
+- Watch the demo video and project page here 👉 [video](https://ethglobal.com/showcase/onchainguard-ki7x6)
+
+## How does it work
+
+![Banner](/assets/workflow.png)
 
 ## Deployed smart contracts (alphabetically)
 
